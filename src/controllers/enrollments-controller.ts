@@ -17,7 +17,7 @@ export async function getEnrollmentByUser(req: AuthenticatedRequest, res: Respon
 }
 
 export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, res: Response) {
-  if(!req.body || !req.userId) return res.send(httpStatus.BAD_REQUEST);
+  if(!req.body || !req.userId) return res.sendStatus(httpStatus.BAD_REQUEST);
   try {
     await enrollmentsService.createOrUpdateEnrollmentWithAddress({
       ...req.body,
@@ -25,7 +25,12 @@ export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, re
     });
     return res.sendStatus(httpStatus.OK);
   } catch (error) {
-    return res.sendStatus(httpStatus.NO_CONTENT);
+    if (error.name === 'NotFoundError') {
+      return res.send(httpStatus.BAD_REQUEST);
+    }
+    else{
+      return res.send(httpStatus.BAD_REQUEST)
+    }    
   }
 }
 
@@ -39,6 +44,9 @@ export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response
   } catch (error) {
     if (error.name === 'NotFoundError') {
       return res.send(httpStatus.NO_CONTENT);
+    }
+    else{
+      return res.send(httpStatus.BAD_REQUEST)
     }
   }
 }
